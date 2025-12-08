@@ -15,5 +15,12 @@ class StudySession(models.Model):
     duration_minutes = models.IntegerField()
     notes = models.TextField(blank = True)
 
+class StudentProgress(models.Model):
+    subject = models.ForeignKey(Suvject,on_delete=models.CASCADE)
+    date = models.DateField()
+    progress_notes = models.TextField()
+    
+
+
 
 # Create your models here.
