@@ -16,7 +16,7 @@ class StudySession(models.Model):
     notes = models.TextField(blank = True)
 
 class StudentProgress(models.Model):
-    subject = models.ForeignKey(Suvject,on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject,on_delete=models.CASCADE)
     date = models.DateField()
     progress_notes = models.TextField()
     
