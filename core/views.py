@@ -57,24 +57,31 @@ def subject(request, numri):
             if 'description' in data:
                 subject.description = data['description']
                 subject.save()
-        except:
             
+            subject.save()
 
-
-
-        
-        #Duhet marre objekti nga db me id
-            return JsonResponse({"error": "Subject not found"}, status=404)
-
-        #duhet ndryshu name dhe description 
-
-
-
-        #duhet bere save objekti ne db
-
-        #return succesful message : Old dhe new
+            return JsonResponse({
+                "message": "Subject updated successfully",
+                "subject": {
+                    "id": subject.id,
+                    "name": subject.name,
+                    "description": subject.description
+                }
+            })
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
     
-    return JsonResponse({"error":"Method not allowed"})
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    if request.method == 'DELETE':
+        try:
+            subject = Subject.objects.get(id=numri)
+            subject.delete()
+            return JsonResponse({"message": "Subject deleted successfully"})
+        except Subject.DoesNotExist:
+            return JsonResponse({"error": "Subject not found"}, status=404)
+        
+
 
 
 
