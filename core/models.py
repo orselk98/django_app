@@ -1,5 +1,6 @@
+import django.utils.timezone
 from django.db import models
-from datetime import datetime
+
 
 
 class Subject(models.Model):
@@ -12,7 +13,7 @@ class Subject(models.Model):
     
 class StudySession(models.Model):
     subject = models.ForeignKey(Subject,on_delete=models.CASCADE)
-    datetime =models.DateTimeField(default=datetime.now())
+    datetime =models.DateTimeField(default=django.utils.timezone.now)
     duration_minutes = models.IntegerField()
     notes = models.TextField(blank = True)
 
