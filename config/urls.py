@@ -4,11 +4,14 @@ from core.views import (
     subject_list, 
     subject, 
     study_session_list, 
-    study_session
+    study_session,
+    total_time,
+    search_by_date
 )
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+
 
 
 urlpatterns = [
@@ -19,4 +22,7 @@ urlpatterns = [
     path('subject/<int:numri>/', subject),
     path('study-session-list/', study_session_list),
     path('study-session/<int:numri>/', study_session),
+    path('total-time/<int:id>/', total_time),
+    path('search-by-date/<str:date_string>/', search_by_date),
+    path('drf/', include('drf.urls')),
 ]
