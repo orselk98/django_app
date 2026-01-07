@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from core.models import Subject, StudySession
 from .serializers import SubjectSerializer, StudySessionserializer
 
@@ -31,5 +32,20 @@ def subject(request, numri):
 @api_view(["GET"])
 def study_session(request, numri):
      study_session = StudySession.objects.get(id=numri)
-     serializer = StudySessionSerializer(study_session)
+     serializer = StudySessionserializer(study_session)
      return Response(serializer.data)
+
+@api_view (["GET", "POST"])
+def all_study_sessions(request):
+     if request.method  == "GET":
+          qs =StudySession.objects.all()
+          serializers = StudySessionserializer(qs, many =True)
+          return Response (serializers.data)
+     
+     if request.method == "POST":
+          serializers = StudySessionserializer(data=request.data)
+          if serializers.is_valid():
+                serializers.save()
+                return Response (serializers.data)
+          return Response (serializers.errors, status.HTTP_400_BAD_REQUEST)
+    
