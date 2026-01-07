@@ -8,5 +8,5 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 class StudySessionserializer (serializers.ModelSerializer):
     class Meta:
-        model = Subject
+        model = StudySession
         fields = "__all__"
