@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from core.models import Subject, StudySession
+from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
 
 @api_view(['GET'])
@@ -48,4 +49,15 @@ def all_study_sessions(request):
                 serializers.save()
                 return Response (serializers.data)
           return Response (serializers.errors, status.HTTP_400_BAD_REQUEST)
+     
+@api_view (["GET"])
+def study_session_list(request):
+    if request.method == "GET":
+        ss_qs = StudySession.objects.select_related('subject').all()
+        paginator = StudySessionPagination()
+        page = paginator.paginate_queryset(ss_qs, request)
+        serializer = StudySessionserializer(page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
+    return Response({"error": "Method not allowed."})
     
