@@ -54,41 +54,38 @@ def all_study_sessions(request):
      
 @api_view (["GET"])
 def study_session_list(request):
-    if request.method == "GET":
-        subject_id = request.GET.get("subject_id", None)
-        #Check if subject is is provided
-        #Search for db for studysession with subject_id
-        #return
-        if subject_id:
-            
-            qs = StudySession.objects.filter(subject__id=subject_id)
+    qs = StudySession.objects.all()
+    #Get all filter parameters
+    subject_id =request.GET.get("subject_id", None)
+    duration_minutes = request.GET.get("duration_minutes", None)
+    start_date =request.GET.get('start_date')
+    end_date =request.GET.get('end_date')
+    ordering = request.GET.get('ordering', None)
 
-            serializer = StudySessionserializer(qs, many=True)
+    #Apply filters only if they exist
+    if subject_id:
+         qs = qs.filter(subject__id=subject_id)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+    if duration_minutes:
+         qs = qs.filter(duration_minutes__gte=duration_minutes)
 
-        duration_minutes = request.GET.get("duration_minutes", None)
-        if duration_minutes:
-             qs = StudySession.objects.filter(duration_minutes__gte=duration_minutes)
-             
-             serializer = StudySessionserializer(qs, many=True)
+    if start_date and end_date:
+         start = datetime.fromisoformat(start_date)
+         end = datetime.fromisoformat(end_date)
+         qs = qs.filter(datetime__gte=start, datetime__lte=end)
+    
+    if ordering.startswith('-'):
+            qs = qs.order_by(ordering)
+    else:
+            qs = qs.order_by(ordering or 'id')
+    
+    #Apply pagination
+    paginator = StudySessionPagination()
+    paginated_qs = paginator.paginate_queryset(qs, request)
 
-             return Response(serializer.data,status=status.HTTP_200_OK)
-        
-        
-        start_date =request.GET.get('start_date')
-        end_date =request.GET.get('end_date')
-        if start_date and end_date:
-             start =datetime.fromisoformat(start_date)
-             end =datetime.fromisoformat(end_date)
-             qs = StudySession.objects.filter(datetime__gte=start_date,datetime__lte=end_date)
-             
-             serializer = StudySessionserializer(qs,many=True)
+    serializer = StudySessionserializer(paginated_qs, many=True)
 
-             return Response(serializer.data,status=status.HTTP_200_OK)
-
-
-             
+    return paginator.get_paginated_response(serializer.data)
 
 
 class SubjectViewSET(viewsets.ModelViewSet):
