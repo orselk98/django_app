@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import status
+from datetime import datetime
 from core.models import Subject, StudySession
 from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
@@ -73,12 +74,18 @@ def study_session_list(request):
          start = datetime.fromisoformat(start_date)
          end = datetime.fromisoformat(end_date)
          qs = qs.filter(datetime__gte=start, datetime__lte=end)
-    
-    if ordering.startswith('-'):
-            qs = qs.order_by(ordering)
-    else:
-            qs = qs.order_by(ordering or 'id')
-    
+
+    if ordering:
+        if ordering.startswith('-'):
+            date_obj = datetime.fromisoformat(ordering[1:])
+            qs = StudySession.objects.all().filter(datetime__lte=date_obj).order_by("-datetime")
+            serializer = StudySessionserializer(qs, many=True)
+            return Response(serializer.data)
+        else:
+            date_obj=datetime.fromisoformat(ordering)
+            qs=StudySession.objects.all().filter(datetime__gte=date_obj).order_by("datetime")
+            serializer = StudySessionserializer(qs,many=True)
+            return Response(serializer.data)
     #Apply pagination
     paginator = StudySessionPagination()
     paginated_qs = paginator.paginate_queryset(qs, request)
