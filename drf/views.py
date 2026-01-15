@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import status
-from datetime import datetime
+from datetime import datetime, date
 from core.models import Subject, StudySession
 from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
@@ -77,15 +77,24 @@ def study_session_list(request):
 
     if ordering:
         if ordering.startswith('-'):
-            date_obj = datetime.fromisoformat(ordering[1:])
-            qs = StudySession.objects.all().filter(datetime__lte=date_obj).order_by("-datetime")
-            serializer = StudySessionserializer(qs, many=True)
-            return Response(serializer.data)
+            try:
+                date_obj = date.fromisoformat(ordering[1:])
+            except ValueError:
+                return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+            qs = StudySession.objects.all().filter(date__lte=date_obj).order_by("-datetime")
+            
+            
         else:
-            date_obj=datetime.fromisoformat(ordering)
-            qs=StudySession.objects.all().filter(datetime__gte=date_obj).order_by("datetime")
+            try:
+                date_obj=date.fromisoformat(ordering)
+            except ValueError:
+                return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+            qs=StudySession.objects.all().filter(date__gte=date_obj).order_by("datetime")
             serializer = StudySessionserializer(qs,many=True)
             return Response(serializer.data)
+        
+        serializer = StudySessionserializer(qs, many=True)
+        return Response(serializer.data)
     #Apply pagination
     paginator = StudySessionPagination()
     paginated_qs = paginator.paginate_queryset(qs, request)
