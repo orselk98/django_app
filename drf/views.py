@@ -10,6 +10,7 @@ from core.models import Subject, StudySession
 from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
 
+
 @api_view(['GET'])
 def test2(request):
     return Response({"message": "DRF view is working."})
@@ -25,19 +26,27 @@ def all_subjects(request):
         serializer = SubjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
         
 @api_view(["GET"])
 def subject(request, numri):
-        subject = Subject.objects.get(id=numri)
-        serializer = SubjectSerializer(subject, many=False)
-        return Response(serializer.data)
+        try:
+            subject = Subject.objects.get(id=numri)
+            serializer = SubjectSerializer(subject, many=False)
+            return Response(serializer.data)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["GET"])
 def study_session(request, numri):
-     study_session = StudySession.objects.get(id=numri)
-     serializer = StudySessionserializer(study_session)
-     return Response(serializer.data)
+     try:
+          study_session = StudySession.objects.get(id=numri)
+          serializer = StudySessionserializer(study_session)
+          return Response(serializer.data)
+     except StudySession.DoesNotExist:
+          return Response({"error": "Study session not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view (["GET", "POST"])
 def all_study_sessions(request):
