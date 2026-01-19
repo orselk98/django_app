@@ -1,7 +1,8 @@
 from django.test import TestCase
 from rest_framework.test import APITestCase
-from core.models import Subject
+from core.models import Subject, StudySession
 from django.urls import reverse
+from datetime import datetime
 
 # Create your tests here.
 class SubjectTests(APITestCase):
@@ -63,8 +64,30 @@ class SubjectTests(APITestCase):
         self.assertEqual(response.data["error"],"Subject not found")
 
 class StudySessionTests(APITestCase):
-    
+    def setUp(self):
+        self.math = Subject.objects.create(
+            name="Math",
+            description="Mathematics Subject"
+        )
+        self.history = Subject.objects.create(
+            name="History",
+            description="WW2 History"
+        )
+        self.studysession1 = StudySession.objects.create(
+            subject = self.math,
+            duration_minutes = 60,
+            notes = "Basic Concepts"
+        )
+        self.studysession2=StudySession.objects.create(
+            subject = self.history,
+            duration_minutes=120,
+            notes ="France during WW2"
+        )
+    def test_study_session_detail(self):
+        url =reverse("study-session", args=[self.studysession1.id])
+        response =self.client.get(url)
 
 
-
-    
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["subject"], self.math.id)
+        self.assertEqual(response.data["duration_minutes"],60)

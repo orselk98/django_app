@@ -15,7 +15,7 @@ urlpatterns = [
     path('test2/', test2),
     path('all-subjects/', all_subjects,name ="all-subjects"),
     path('subject/<int:numri>/', subject, name="subject"),
-    path('study-session/<int:numri>/', study_session),
+    path('study-session/<int:numri>/', study_session, name="study-session"),
     path('all-study-sessions/', all_study_sessions),
     path('study-session-list/', study_session_list),
     path("",include(router.urls)),
