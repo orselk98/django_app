@@ -91,3 +91,5 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["subject"], self.math.id)
         self.assertEqual(response.data["duration_minutes"],60)
+    
+    

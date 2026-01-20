@@ -25,7 +25,7 @@ def subject_list(request):
 @csrf_exempt
 def subject(request, numri):
     if request.method == 'GET':
-        subject = Subject.objects.first(id=numri)
+        subject = Subject.objects.get(id=numri)
 
 
         subject_dict ={
@@ -34,7 +34,7 @@ def subject(request, numri):
             "description": subject.description
         }
 
-        return JsonResponse(subject, safe=False)
+        return JsonResponse(subject_dict, safe=False)
     
 #how to make a post request in django
   
@@ -223,16 +223,14 @@ def total_time(request, id):
 def search_by_date(request, date_string):
     if request.method == "GET":
         # Supozojm qe date_string eshte 2025-12-10 YYYY-MM-DD
-        if int(date_string[1:4]) > 2100:
+        if int(date_string[:4]) > 2100:
             return JsonResponse({"Error":"Invalid year"})
         datetime_search = datetime.fromisoformat(date_string)
-        try:
-            ss_qs = StudySession.objects.filter(datetime__year=datetime_search.year,
+        
+        ss_qs = StudySession.objects.filter(datetime__year=datetime_search.year,
                                                 datetime__month=datetime_search.month,
                                                 datetime__day=datetime_search.day)
-        except StudySession.DoesNotExist:
-            return JsonResponse({"Error":"StudySession not found"})
-        
+            
         ss_list = []
         for ss in ss_qs:
             print("ERROR ",ss)
@@ -244,4 +242,6 @@ def search_by_date(request, date_string):
                 "duration_minutes": ss.duration_minutes,
                 "notes": ss.notes
             })
+        if ss_list == []:
+            return JsonResponse({"Error":"StudySession not found"})
         return JsonResponse(ss_list, safe=False)
