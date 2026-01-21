@@ -21,6 +21,18 @@ class SubjectTests(TestCase):
         subject_id=self.subject1.id
         response =c.get(f"/subject/{subject_id}/")
         self.assertEqual(response.json()["name"],"Test Name")
+    
+    def test_subject_list_get(self):
+        c = Client()
+        response=c.get(f"/subject-list/")
+        #IS the response a list?
+        self.assertEqual(isinstance(response.json(), list),True)
+        #Does the list contain 2 items?
+        self.assertEqual(len(response.json()),2)
+        #Are the correct subject names present?
+        names =[item["name"] for item in response.json()]
+        self.assertIn("Test Name",names)
+        self.assertIn("Test 2",names)
 
     def test_patch_subject(self):
         c=Client()
