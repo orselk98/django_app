@@ -112,6 +112,17 @@ def study_session_list(request):
 
     return paginator.get_paginated_response(serializer.data)
 
+@api_view (["GET"])
+async def total_time_all_subjects(request):
+     if request.method == "GET":
+        subject_qs = Subject.objects.all()
+        list1 =[]
+        for subject in subject_qs:
+            study_sessions=StudySession.objects.filter(subject=subject)
+            total_time=sum(session.duration_minutes for session in study_sessions)
+            dict1 = {"id":subject.id,"Total Time":total_time}
+            list1.append(dict1)
+        return Response(list1)
 
 class SubjectViewSET(viewsets.ModelViewSet):
     queryset = Subject.objects.all()

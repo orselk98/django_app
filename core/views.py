@@ -209,13 +209,18 @@ def total_time(request, id):
         except Subject.DoesNotExist:
             return JsonResponse({"Error":"Subject not found"})
         
+        
         # Duhet te marrim duration_minutes nga Study Session
         ss_qs = StudySession.objects.filter(subject=subject)
 
         # For loop te mbledhi kohen dhe do printoj totalin
         sum_total_time = 0 
         for ss in ss_qs:
-            sum_total_time = sum_total_time + ss.duration_minutes
+                sum_total_time = sum_total_time + ss.duration_minutes 
+        
+        if not ss_qs:
+            return JsonResponse({"Error":"Subject has no Study Sessions"})
+        
         
         # Return Total time spent on a subject
         return JsonResponse({"Total Time": sum_total_time})

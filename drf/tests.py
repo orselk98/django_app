@@ -92,4 +92,7 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.data["subject"], self.math.id)
         self.assertEqual(response.data["duration_minutes"],60)
     
+    #def test_study_session_detail_not_found(self):
+        
+    
     
