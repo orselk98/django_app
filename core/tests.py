@@ -103,6 +103,12 @@ class StudySessionTests(TestCase):
         response=c.get(f"/total-time/{new_subject.id}/")
         self.assertEqual(response.json(),{"Error":"Subject has no Study Sessions"})
 
+    def test_search_by_date_no_ss(self):
+        c=Client()
+        response=c.get(f"/search-by-date/2024-11-11/")
+        self.assertEqual(response.json(),{"Error":"StudySession not found"})
+
+    
 
 
     
