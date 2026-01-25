@@ -15,7 +15,12 @@ class SubjectTests(TestCase):
             name ="Test 2",
             description="Test2"
         )
-    
+    def test_get_subject_not_found(self):
+        c=Client()
+        response = c.get("/subject/9999/")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"],"Subject not found")
+
     def test_get_subject(self):
         c = Client()
         subject_id=self.subject1.id
@@ -34,6 +39,28 @@ class SubjectTests(TestCase):
         self.assertIn("Test Name",names)
         self.assertIn("Test 2",names)
 
+    def test_subject_post(self):
+        c=Client()
+        subject_count=Subject.objects.count()
+        response=c.post(f"/subject-list/",json.dumps({"name":"Test Name3","description":"Test3"}),content_type="application/json")
+        self.assertEqual(response.json()["message"],"Post created Successfully")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Subject.objects.count(),subject_count+1)
+        self.assertTrue(Subject.objects.filter(name="Test Name3").exists())
+    
+    def test_subject_post_invalid_json(self):
+        c=Client()
+        response=c.post(f"/subject-list/","Invalid Json",content_type="application/json")
+        self.assertEqual(response.json(),{"error": "Invalid JSON"})
+    
+    def test_subject_post_missing_name(self):
+        c=Client()
+        response=c.post("/subject-list/",json.dumps({"description":"no-description"}),content_type="application/json")
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(response.json()["error"], "Name is required")
+
+
+
     def test_patch_subject(self):
         c=Client()
         subject_id = self.subject1.id
@@ -42,12 +69,32 @@ class SubjectTests(TestCase):
         self.assertEqual(response.json()["message"],"Object Updated succesfully")
         updated_subject=Subject.objects.get(id=subject_id)
         self.assertEqual (updated_subject.name,"New Name")
+    
+    def test_patch_subject_not_found(self):
+        c=Client()
+        response=c.patch(f"/subject/9999/",json.dumps({"name":"new Name"}))
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),{"error":"Subject not found"})
+    
+    def test_patch_subject_invalid_json(self):
+        c=Client()
+        subject_id = self.subject1.id
+        response=c.patch(f"/subject/{subject_id}/","Invalid JSON",json.dumps({"name":"new Name"}))
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(response.json(),{"error":"Invalid JSON"})
+
+
 
     def test_delete_subject(self):
         c=Client()
         old_subject=self.subject1
         response =c.delete(f"/subject/{old_subject.id}/")
         self.assertEqual(response.json()["message"],"Deleted succesfully")
+    def test_delete_subject_not_found(self):
+        c=Client()
+        response=c.delete(f"/subject/9999/")
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),{"error": "Subject not found"})
 
 class StudySessionTests(TestCase):
     def setUp(self):
@@ -107,6 +154,8 @@ class StudySessionTests(TestCase):
         c=Client()
         response=c.get(f"/search-by-date/2024-11-11/")
         self.assertEqual(response.json(),{"Error":"StudySession not found"})
+    
+
 
     
 

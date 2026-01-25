@@ -15,17 +15,42 @@ def index(request):
 def test_view(request):
     return JsonResponse({"message":"view is working."})
 
+@csrf_exempt
 def subject_list(request):
     if request.method == 'GET':
         subject_qs = Subject.objects.all().values("id","name","description")
         subjects = list(subject_qs)
         return JsonResponse(subjects, safe=False)
-    return JsonResponse({"error":"Method not allowed"})
+    
+    if request.method =='POST':
+        #duhen marre te dhenat nga request:
+        try:
+            data =json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse ({"error": "Invalid JSON"}, status = 400)
+        
+        name = data.get('name')
+        if not name:
+            return JsonResponse ({"error": "Name is required"}, status = 400)
+        description = data.get('description', '')
+
+
+        #duhen krijuar te dhenat  objekti ne database
+
+        subject = Subject.objects.create(name=name, description=description)
+        #dergo mesazhin e suksesit
+        return JsonResponse ({"message": "Post created Successfully"}, status = 201)
+
+
+
 
 @csrf_exempt
 def subject(request, numri):
     if request.method == 'GET':
-        subject = Subject.objects.get(id=numri)
+        try:
+            subject = Subject.objects.get(id=numri)
+        except Subject.DoesNotExist:
+            return JsonResponse({"error": "Subject not found"}, status=404)
 
 
         subject_dict ={
@@ -47,12 +72,14 @@ def subject(request, numri):
             return JsonResponse ({"error": "Invalid JSON"}, status = 400)
         
         name = data.get('name')
+        if not name:
+            return JsonResponse ({"error": "Name is required"}, status = 400)
         description = data.get('description', '')
 
 
         #duhen krijuar te dhenat  objekti ne database
-
         subject = Subject.objects.create(name=name, description=description)
+
         #dergo mesazhin e suksesit
         return JsonResponse ({"message": f"{name} and {description} was created successfully"}, status = 201)
     
@@ -66,7 +93,10 @@ def subject(request, numri):
         name = data.get("name")
         description = data.get("description", "")
         # Duhet marr objekti nga db me id
-        subject = Subject.objects.get(id=numri)
+        try:
+            subject = Subject.objects.get(id=numri)
+        except Subject.DoesNotExist:
+            return JsonResponse({"error": "Subject not found"}, status=404)
         # Duhet ndryshuar name dhe description
         if name:
             subject.name = name
@@ -75,17 +105,22 @@ def subject(request, numri):
         # Duhet ber save objekti ne db
         subject.save()
         return JsonResponse({"message":"Object Updated succesfully"})
+
         
     
     
     if request.method == "DELETE":
-        subject = Subject.objects.get(id=numri)
+        try:
+            subject = Subject.objects.get(id=numri)
+        except Subject.DoesNotExist:
+            return JsonResponse({"error": "Subject not found"}, status=404)
+
         if subject:
                 subject.delete()
                 return JsonResponse({"message": "Deleted succesfully"})
-        return JsonResponse({"Error": "Subject not found"})
+        return JsonResponse({"error": "Subject not found"})
 
-    return JsonResponse({"Error":"Method not allowed."})
+    return JsonResponse({"error":"Method not allowed."})
 
 def study_session_list(request):
     if request.method == "GET":
