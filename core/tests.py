@@ -155,6 +155,24 @@ class StudySessionTests(TestCase):
         response=c.get(f"/search-by-date/2024-11-11/")
         self.assertEqual(response.json(),{"Error":"StudySession not found"})
     
+    def test_get_study_session_list(self):
+        c=Client()
+        response=c.get(f"/study-session-list/")
+        self.assertEqual(isinstance(response.json(),list),True)
+        self.assertEqual(len(response.json()),2)
+
+    def test_get_single_study_session(self):
+        c=Client()
+        ss_id=self.ss1.id
+        response=c.get(f"/study-session/{ss_id}/")
+        breakpoint()
+        self.assertEqual(response.json()["id"],ss_id)
+        
+
+
+
+        
+
 
 
     
