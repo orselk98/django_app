@@ -165,8 +165,16 @@ class StudySessionTests(TestCase):
         c=Client()
         ss_id=self.ss1.id
         response=c.get(f"/study-session/{ss_id}/")
-        breakpoint()
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["id"],ss_id)
+
+    def test_get_study_session_not_found(self):
+        c=Client()
+        response=c.get(f"/study-session/9999/")
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),{"error":"Study Session not found"})
+
+
         
 
 
