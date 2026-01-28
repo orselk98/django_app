@@ -190,7 +190,7 @@ def study_session(request, numri):
         )
 
         # Dergo mesazh suksesi
-        return JsonResponse({"message":"Study Session was created succesfully"})
+        return JsonResponse({"message":"Study Session was created successfully",}, status=201)
     
     if request.method == "PATCH":
         # Marrim te dhenat nga requesti (id, name, description)

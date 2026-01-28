@@ -174,6 +174,18 @@ class StudySessionTests(TestCase):
         self.assertEqual(response.status_code,404)
         self.assertEqual(response.json(),{"error":"Study Session not found"})
 
+    def test_post_create_studysession(self):
+        c=Client()
+        ss_count=StudySession.objects.count()
+        response=c.post(f"/study-session/1/",json.dumps({"subject":self.subject1.id,
+                                                      "datetime":"2025-12-20",
+                                                      "duration_minutes":45,
+                                                      "notes":"New"}),content_type="application/json")
+        self.assertEqual(response.json()["message"],"Study Session was created successfully")
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(StudySession.objects.count(),ss_count+1)
+
+
 
         
 
