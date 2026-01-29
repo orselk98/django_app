@@ -63,6 +63,9 @@ class SubjectTests(APITestCase):
         self.assertEqual(response.status_code,404)
         self.assertEqual(response.data["error"],"Subject not found")
 
+ 
+ 
+
 class StudySessionTests(APITestCase):
     def setUp(self):
         self.math = Subject.objects.create(
@@ -91,8 +94,29 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["subject"], self.math.id)
         self.assertEqual(response.data["duration_minutes"],60)
+
+    def test_total_time_async(self):
+        # StudySession.objects.create(
+        #     subject=self.subject1,
+        #     datetime="2026-01-29",
+        #     duration_minutes=30,
+        #     notes="Test Notes",
+        # )
+        url = reverse("total-time-all-subjects-async")
+        response = self.client.get(url)
+        breakpoint()
     
     #def test_study_session_detail_not_found(self):
+
+    # def test_all_study_sessions(self):
+    #     url = reverse("all-study-sessions")
+    #     response = self.client.get (url)
+
+    #     self.assertEqual(response.status_code,200)
+    #     self.assertEqual(response.data[0]["subject"],self.math.id)
+    #     self.assertEqual(response.data[0]["duration_minutes"],60)
+    #     self.assertEqual(response.data[1]["subject"],self.history.id)
+    #     self.assertEqual(response.data[1]["duration_minutes"],120)
         
     
     

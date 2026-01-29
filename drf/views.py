@@ -9,6 +9,7 @@ from datetime import datetime, date
 from core.models import Subject, StudySession
 from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
+from adrf.views import APIView
 
 
 @api_view(['GET'])
@@ -134,4 +135,17 @@ class StudySessionViewSET(viewsets.ModelViewSet):
 
 
   
+class TotalTimeAllSubjectsAsync(APIView):
+    async def get(self, request):
+        if request.method == "GET":
+            subject_qs = Subject.objects.all()
+            list1 =[]
+            async for subject in subject_qs:
+                study_sessions=StudySession.objects.filter(subject=subject)
+                total_time =0
+                async for session in study_sessions:
+                    total_time += session.duration_minutes
+                dict1 = {"id":subject.id,"Total Time":total_time}
+                list1.append(dict1)
+            return Response(list1)
     

@@ -1,6 +1,13 @@
 from django.urls import include, path
-from .views import test2, all_subjects, study_session, subject, all_study_sessions, study_session_list, total_time_all_subjects
-
+from .views import (TotalTimeAllSubjectsAsync, 
+                    test2, 
+                    all_subjects, 
+                    study_session, 
+                    subject, 
+                    all_study_sessions, 
+                    study_session_list, 
+                    total_time_all_subjects
+)
 from rest_framework.routers import DefaultRouter
 from .views import SubjectViewSET, StudySessionViewSET
 
@@ -20,5 +27,6 @@ urlpatterns = [
     path('study-session-list/', study_session_list),
     path('total-time-all-subjects/', total_time_all_subjects),
     path("",include(router.urls)),
-    path("total-time-all-subjects/", total_time_all_subjects, name="total-time-all-subjects")
+    path("total-time-all-subjects/", total_time_all_subjects, name="total-time-all-subjects"),
+    path("total-time-all-subjects-async", TotalTimeAllSubjectsAsync.as_view(),name="total-time-all-subjects-async"),
 ]
