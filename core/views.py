@@ -205,7 +205,10 @@ def study_session(request, numri):
         notes = data.get("notes", None)
 
         # Duhet marr objekti nga db me id
-        ss = StudySession.objects.get(id=numri)
+        try:
+            ss = StudySession.objects.get(id=numri)
+        except StudySession.DoesNotExist:
+            return JsonResponse({"error": "Study Session not found"}, status=404)
         # Duhet ndryshuar name dhe description
         if subject_id:
             try:
@@ -223,14 +226,15 @@ def study_session(request, numri):
         ss.save()
 
         # return successful message, Old dhe new
-        return JsonResponse({"message":"Object Updated succesfully"})
+        return JsonResponse({"message":"Object Updated Successfully"})
 
     if request.method == "DELETE":
-        ss = StudySession.objects.get(id=numri)
-        if ss:
-            ss.delete()
-            return JsonResponse({"message": "Deleted succesfully"})
-        return JsonResponse({"Error": "Study Session not found"})
+        try:
+            ss = StudySession.objects.get(id=numri)
+        except StudySession.DoesNotExist:
+            return JsonResponse({"error": "Study Session not found"}, status=404)
+        ss.delete()
+        return JsonResponse({"message": "Deleted successfully"})
     
     return JsonResponse({"Error":"Method not allowed."})
 

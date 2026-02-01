@@ -185,8 +185,50 @@ class StudySessionTests(TestCase):
         self.assertEqual(response.status_code,201)
         self.assertEqual(StudySession.objects.count(),ss_count+1)
 
+    def test_post_study_session_invalid_JSON(self):
+        c=Client()
+        response=c.post(f"/study-session/1/","Invalid JSON",content_type="application/json")
+        self.assertEqual(response.json(),{"error": "Invalid JSON"})
 
+    def test_post_study_session_missing_subject(self):
+        c=Client()
+        response=c.post("/study-session/9999/",json.dumps({
+            "datetime":"2025-12-15",
+            "duration_minutes":45,
+            "notes":"new"
+        }),content_type="application/json")
+        self.assertEqual(response.json()["error"], "Subject not found")
+        self.assertEqual(response.status_code,404)
 
+    
+    def test_patch_study_session(self):
+        c=Client()
+        ss_id=self.ss1.id
+        response=c.patch(f"/study-session/{ss_id}/",json.dumps({
+            "duration_minutes":90
+        }),content_type="application/json")
+        self.assertEqual(response.json()["message"],"Object Updated Successfully")
+        updated_study_session=StudySession.objects.get(id=ss_id)
+        self.assertEqual(updated_study_session.duration_minutes,90)
+
+    def test_patch_study_session_not_found(self):
+        c=Client()
+        response=c.patch(f"/study-session/9999/",json.dumps({
+            "duration_minutes": 45454
+        }),content_type="application/json")
+        self.assertEqual(response.status_code,404)
+
+    def test_delete_study_session(self):
+        c=Client()
+        ss_id=self.ss1.id
+        response=c.delete(f"/study-session/{ss_id}/")
+        self.assertEqual(response.json()["message"],"Deleted successfully")
+    
+    def test_delete_study_session_not_found(self):
+        c=Client()
+        response=c.delete(f"/study-session/9999/")
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),{"error": "Study Session not found"})
         
 
 

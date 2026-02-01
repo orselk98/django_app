@@ -95,16 +95,16 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.data["subject"], self.math.id)
         self.assertEqual(response.data["duration_minutes"],60)
 
-    def test_total_time_async(self):
-        # StudySession.objects.create(
-        #     subject=self.subject1,
-        #     datetime="2026-01-29",
-        #     duration_minutes=30,
-        #     notes="Test Notes",
-        # )
-        url = reverse("total-time-all-subjects-async")
-        response = self.client.get(url)
-        breakpoint()
+    # def test_total_time_async(self):
+    #     # StudySession.objects.create(
+    #     #     subject=self.subject1,
+    #     #     datetime="2026-01-29",
+    #     #     duration_minutes=30,
+    #     #     notes="Test Notes",
+    #     # )
+    #     url = reverse("total-time-all-subjects-async")
+    #     response = self.client.get(url)
+
     
     #def test_study_session_detail_not_found(self):
 
