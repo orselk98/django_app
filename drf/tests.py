@@ -104,15 +104,15 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.data["error"],"Study session not found")
 
     def test_study_session_list_filter_by_subject(self):
-        url=reverse("study-session-list")
+        url=reverse("study-session-filter")
         response=self.client.get(url,{"subject_id":self.math.id})
         print("====DEBUG===")
         print(f"math.id: {self.math.id}")
         print(f"response.data: {response.data}")
         print("=== END DEBUG ===")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(response.data[0]["subject"],self.math.id)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["results"][0]["subject"],self.math.id)
+        self.assertEqual(len(response.data["results"]), 1)
 
 
     # def test_total_time_async(self):
