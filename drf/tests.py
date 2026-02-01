@@ -1,8 +1,10 @@
+from urllib import response
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from core.models import Subject, StudySession
 from django.urls import reverse
 from datetime import datetime
+
 
 # Create your tests here.
 class SubjectTests(APITestCase):
@@ -94,6 +96,24 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["subject"], self.math.id)
         self.assertEqual(response.data["duration_minutes"],60)
+
+    def test_study_session_detail_not_found(self):
+        url=reverse("study-session", args=[999])
+        response=self.client.get(url)
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.data["error"],"Study session not found")
+
+    def test_study_session_list_filter_by_subject(self):
+        url=reverse("study-session-list")
+        response=self.client.get(url,{"subject_id":self.math.id})
+        print("====DEBUG===")
+        print(f"math.id: {self.math.id}")
+        print(f"response.data: {response.data}")
+        print("=== END DEBUG ===")
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data[0]["subject"],self.math.id)
+        self.assertEqual(len(response.data), 1)
+
 
     # def test_total_time_async(self):
     #     # StudySession.objects.create(

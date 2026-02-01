@@ -68,6 +68,7 @@ def study_session_list(request):
     qs = StudySession.objects.all()
     #Get all filter parameters
     subject_id =request.GET.get("subject_id", None)
+    print(f"=== VIEW: subject_id = {subject_id} ===")
     duration_minutes = request.GET.get("duration_minutes", None)
     start_date =request.GET.get('start_date')
     end_date =request.GET.get('end_date')
