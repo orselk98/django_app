@@ -1,15 +1,23 @@
 from django.shortcuts import render
 
 from rest_framework.decorators import api_view
+from adrf.decorators import api_view as async_api_view
 from rest_framework.response import Response
 from datetime import datetime
 from rest_framework import viewsets
-from rest_framework import status
-from datetime import datetime, date
+from django.db.models import Sum
+
 from core.models import Subject, StudySession
-from .pagination import StudySessionPagination
 from .serializers import SubjectSerializer, StudySessionserializer
+
+from .pagination import StudySessionPagination
 from adrf.views import APIView
+
+import requests
+
+from asgiref.sync import sync_to_async
+
+from rest_framework import status
 
 
 @api_view(['GET'])
@@ -150,3 +158,17 @@ class TotalTimeAllSubjectsAsync(APIView):
                 list1.append(dict1)
             return Response(list1)
     
+@api_view (["POST"])
+def third_party_api(request):
+    if request.method =="POST":
+        name=request.data.get("name")
+        response =requests.get(
+            "https://api.agify.io/",
+            params={"name":name},
+            timeout=10)
+
+        #{{"count":21,"name":"meelad","age":36}}
+        description = f"count: {response.json()['count']}, age: {response.json()['age']}"
+        subject=Subject.objects.create(name=name, description=description)
+        serializer = SubjectSerializer(subject, many =False)
+        return Response(serializer.data)

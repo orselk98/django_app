@@ -1,9 +1,11 @@
+from unittest.mock import Mock, patch
 from urllib import response
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from core.models import Subject, StudySession
 from django.urls import reverse
 from datetime import datetime
+
 
 
 # Create your tests here.
@@ -64,6 +66,44 @@ class SubjectTests(APITestCase):
 
         self.assertEqual(response.status_code,404)
         self.assertEqual(response.data["error"],"Subject not found")
+    
+    def test_third_party_api(self):
+        payload = {"name": "matt"}
+
+        url = reverse("third-party-api")
+        response = self.client.post(url, payload)
+
+        self.assertEqual(response.data["name"], "matt")
+
+    @patch("drf.views.requests.get")  # IMPORTANT: patch where it's USED
+    def test_third_party_api_creates_subject(self, mock_get):
+        # Mock third-party API response
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "count": 22,
+            "name": "matt",
+            "age": 22,
+        }
+        mock_get.return_value = mock_response
+
+        url = reverse("third-party-api")  # make sure your URL has this name
+        response = self.client.post(url, {"name": "matt"}, format="json")
+
+        assert response.status_code == 200
+        assert response.data["name"] == "matt"
+        assert response.data["description"] == "count: 22, age: 22"
+
+        # DB assertion
+        subject = Subject.objects.get(name="matt")
+        assert subject.description == "count: 22, age: 22"
+
+        # Ensure third-party API was called correctly
+        mock_get.assert_called_once_with(
+            "https://api.agify.io/",
+            params={"name": "matt"},
+            timeout=10,
+        )
+
 
  
  
@@ -106,13 +146,11 @@ class StudySessionTests(APITestCase):
     def test_study_session_list_filter_by_subject(self):
         url=reverse("study-session-filter")
         response=self.client.get(url,{"subject_id":self.math.id})
-        print("====DEBUG===")
-        print(f"math.id: {self.math.id}")
-        print(f"response.data: {response.data}")
-        print("=== END DEBUG ===")
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["results"][0]["subject"],self.math.id)
         self.assertEqual(len(response.data["results"]), 1)
+
+    
 
 
     # def test_total_time_async(self):

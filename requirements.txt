@@ -6,3 +6,5 @@ tzdata==2024.2
 djangorestframework
 uvicorn
 adrf
+requests
+pandas

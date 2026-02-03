@@ -5,8 +5,8 @@ from .views import (TotalTimeAllSubjectsAsync,
                     study_session, 
                     subject, 
                     all_study_sessions, 
-                    study_session_list, 
-                    total_time_all_subjects
+                    study_session_list, third_party_api, 
+                    total_time_all_subjects,
 )
 from rest_framework.routers import DefaultRouter
 from .views import SubjectViewSET, StudySessionViewSET
@@ -28,5 +28,6 @@ urlpatterns = [
     path('total-time-all-subjects/', total_time_all_subjects),
     path("",include(router.urls)),
     path("total-time-all-subjects/", total_time_all_subjects, name="total-time-all-subjects"),
-    path("total-time-all-subjects-async", TotalTimeAllSubjectsAsync.as_view(),name="total-time-all-subjects-async"),
+    path("total-time-all-subjects-async", TotalTimeAllSubjectsAsync.as_view(), name="total-time-all-subjects-async"),
+    path("third-party-api/",third_party_api, name="third-party-api")
 ]
