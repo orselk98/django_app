@@ -2,6 +2,8 @@ import json
 from django.test import TestCase
 from core.models import Subject , StudySession
 from django.test import Client
+from datetime import datetime
+from django.utils import timezone
 
 # Create your tests here.
 
@@ -102,15 +104,19 @@ class StudySessionTests(TestCase):
             name ="Test Name",
             description ="Test Description"
         )
+        naive_dt = datetime(2025, 12, 12, 10, 0, 0)
+        aware_dt = timezone.make_aware(naive_dt)
         self.ss1 = StudySession.objects.create(
             subject = self.subject1,
-            datetime="2025-12-12",
+            datetime=aware_dt,
             duration_minutes=60,
             notes="Test Description"
         )
+        naive_dt2 = datetime(2025, 12, 12, 15, 0, 0)
+        aware_dt2 = timezone.make_aware(naive_dt2)
         self.ss2=StudySession.objects.create(
             subject=self.subject1,
-            datetime="2025-12-12",
+            datetime=aware_dt2,
             duration_minutes=60,
             notes="Test Description"
         )

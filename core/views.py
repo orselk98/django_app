@@ -4,6 +4,7 @@ from .models import Subject, StudySession
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+from django.utils import timezone
 import json
 
 # Create your views here.
@@ -171,6 +172,12 @@ def study_session(request, numri):
         
         subject_id = data.get("subject")
         session_datetime = data.get("datetime")
+        try:
+            session_datetime = datetime.strptime(session_datetime, "%Y-%m-%d")
+            aware_dt=timezone.make_aware(session_datetime)
+        except ValueError:
+            return JsonResponse({"error": "Invalid datetime format"}, status=400)
+        
         duration_minutes = data.get("duration_minutes", 60)
         notes = data.get("notes", "")
 
@@ -184,7 +191,7 @@ def study_session(request, numri):
         # Duhet krijuar objekti ne db
         ss = StudySession.objects.create(
             subject=subject_obj, 
-            datetime=session_datetime,
+            datetime=aware_dt,
             duration_minutes=duration_minutes,
             notes=notes
         )
