@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from datetime import datetime
 from rest_framework import viewsets
 from django.db.models import Sum
+from pathlib import Path
+import pandas as pd
 
 from core.models import Subject, StudySession
 from .serializers import SubjectSerializer, StudySessionserializer
@@ -172,3 +174,30 @@ def third_party_api(request):
         subject=Subject.objects.create(name=name, description=description)
         serializer = SubjectSerializer(subject, many =False)
         return Response(serializer.data)
+
+
+
+
+@api_view(["GET"])
+def ss_analytics(request):
+    if request.method == "GET":
+        qs=StudySession.objects.all().values(
+            "id",
+            "datetime",
+            "duration_minutes",
+            "notes",
+        )
+        if not qs.exists():
+            return Response({"message": "No study sessions found"}, status=status.HTTP_404_NOT_FOUND)
+        df = pd.DataFrame(qs)
+        total_sessions = len(df)
+        total_minutes = int (df["duration_minutes"].sum())
+        average_minutes = df["duration_minutes"].mean()
+        sessions_per_day = df.groupby(df['datetime'].dt.strftime('%Y-%m-%d')).size().to_dict()
+        return Response({
+            "total_sessions":total_sessions,
+            "total_minutes": (total_minutes),
+            "average_session_minutes": average_minutes,
+            "sessions_per_day": sessions_per_day
+        })
+    

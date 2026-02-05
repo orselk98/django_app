@@ -1,5 +1,5 @@
 from django.urls import include, path
-from .views import (TotalTimeAllSubjectsAsync, 
+from .views import (TotalTimeAllSubjectsAsync, ss_analytics, 
                     test2, 
                     all_subjects, 
                     study_session, 
@@ -29,5 +29,6 @@ urlpatterns = [
     path("",include(router.urls)),
     path("total-time-all-subjects/", total_time_all_subjects, name="total-time-all-subjects"),
     path("total-time-all-subjects-async", TotalTimeAllSubjectsAsync.as_view(), name="total-time-all-subjects-async"),
-    path("third-party-api/",third_party_api, name="third-party-api")
+    path("third-party-api/",third_party_api, name="third-party-api"),
+    path("ss-analytics/", ss_analytics, name="ss-analytics"),
 ]

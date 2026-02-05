@@ -151,6 +151,39 @@ class StudySessionTests(APITestCase):
         self.assertEqual(len(response.data["results"]), 1)
 
     
+    def test_ss_analytics(self):
+        url=reverse("ss-analytics")
+        response=self.client.get(url)
+        breakpoint()
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["total_sessions"],2)
+        self.assertEqual(response.data["total_minutes"],180)
+        self.assertEqual(response.data["average_minutes"],90)
+        self.assertEqual(response.data["sessions_per_day"],{
+            self.studysession1.datetime.strftime('%Y-%m-%d'): 1,
+            self.studysession2.datetime.strftime('%Y-%m-%d'): 1,
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     # def test_total_time_async(self):
