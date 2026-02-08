@@ -170,7 +170,10 @@ def third_party_api(request):
             timeout=10)
 
         #{{"count":21,"name":"meelad","age":36}}
-        description = f"count: {response.json()['count']}, age: {response.json()['age']}"
+        try:
+            description = f"count: {response.json()['count']}, age: {response.json()['age']}"
+        except (KeyError, ValueError):
+            return Response({"error": "Invalid response from third-party API"}, status=status.HTTP_502_BAD_GATEWAY)
         subject=Subject.objects.create(name=name, description=description)
         serializer = SubjectSerializer(subject, many =False)
         return Response(serializer.data)
@@ -192,11 +195,11 @@ def ss_analytics(request):
         df = pd.DataFrame(qs)
         total_sessions = len(df)
         total_minutes = int (df["duration_minutes"].sum())
-        average_minutes = df["duration_minutes"].mean()
+        average_minutes = int(df["duration_minutes"].mean())
         sessions_per_day = df.groupby(df['datetime'].dt.strftime('%Y-%m-%d')).size().to_dict()
         return Response({
             "total_sessions":total_sessions,
-            "total_minutes": (total_minutes),
+            "total_minutes": total_minutes,
             "average_session_minutes": average_minutes,
             "sessions_per_day": sessions_per_day
         })
