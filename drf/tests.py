@@ -176,7 +176,7 @@ class StudySessionTests(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["total_sessions"],2)
         self.assertEqual(response.data["total_minutes"],180)
-        # self.assertEqual(response.data["average_minutes"],90)
+        self.assertEqual(response.data["average_session_minutes"],90)
         self.assertEqual(response.data["sessions_per_day"],{
             self.studysession1.datetime: 1,
             self.studysession2.datetime: 1,
